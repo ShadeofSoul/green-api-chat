@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import styled, { keyframes, createGlobalStyle } from "styled-components";
+import { useAuth } from "../contexts/AuthContext";
 
 const jump = keyframes`
   from{
@@ -66,7 +67,7 @@ const Button = styled.button`
   color: rgb(253, 249, 243);
   font-weight: 600;
   text-transform: uppercase;
-  background: #f03d4e;
+  background: #25d366;
   border: none;
   border-radius: 3px;
   outline: 0;
@@ -75,7 +76,7 @@ const Button = styled.button`
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease-out;
   :hover {
-    background: rgb(200, 50, 70);
+    background: #075e54;
     animation: ${jump} 0.2s ease-out forwards;
   }
 `;
@@ -88,39 +89,33 @@ const Title = styled.h2`
 `;
 
 function Auth() {
-  const [dados, setDados] = useState({
-    email: "",
-    password: "",
-  });
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log(dados);
-  };
+  const { authData, setAuthData, handleSubmit } = useAuth();
 
   const handleChange = (e) => {
     e.preventDefault();
     const { name, value } = e.target;
-    setDados(Object.assign(dados, { [name]: value }));
+    setAuthData(Object.assign(authData, { [name]: value }));
   };
-
   return (
     <>
       <GlobalStyle />
       <Wrapper>
         <Form onSubmit={handleSubmit}>
           <Input
-            type="email"
-            name="email"
-            value={dados.email}
+            type="text"
+            name="idInstance"
+            placeholder="idInstance"
+            // value={authData.idInstance}
             onChange={handleChange}
           />
           <Input
-            type="password"
-            name="password"
-            value={dados.password}
+            type="text"
+            name="apiTokenInstance"
+            placeholder="apiTokenInstance"
+            // value={authData.apiTokenInstance}
             onChange={handleChange}
           />
-          <Button>Entrar</Button>
+          <Button>Enter</Button>
         </Form>
       </Wrapper>
     </>
