@@ -2,6 +2,8 @@ import styled from "styled-components";
 import { contactList } from "../Data";
 import { useState } from "react";
 import { StyledModal } from "./Modal";
+import { useContact } from "../contexts/ContactContext";
+import { METHODS } from "../helpers/consts";
 
 const Container = styled.div`
   display: flex;
@@ -32,7 +34,7 @@ export const SearchContainer = styled.div`
   background: white;
   border-radius: 16px;
   width: 100%;
-  padding: 20px 0;
+  padding: 10px 0;
 `;
 const SearchIcon = styled.img`
   width: 28px;
@@ -108,22 +110,36 @@ const ContactComponent = (props) => {
   const { userData } = props;
   return (
     <ContactItem>
-      <ProfileIcon src={userData.profilePic} />
+      <ProfileIcon src={"/profile/pp1.png"} />
       <ContactInfo>
         <ContactName>{userData.name}</ContactName>
         <MessageText>Hello</MessageText>
       </ContactInfo>
-      <MessageText>10:04 PM</MessageText>
+      <MessageText>{userData.time}</MessageText>
     </ContactItem>
   );
 };
 
 const ContactListComponent = () => {
   const [isPopOpen, setIsPosOpen] = useState(false);
+  const { state, dispatch } = useContact();
+
+  const handleChangeName = (e) => {
+    e.preventDefault();
+    const { value } = e.target;
+    dispatch({
+      type: "addName",
+      payload: value,
+    });
+  };
 
   const handleChange = (e) => {
     e.preventDefault();
-    const { name, value } = e.target;
+    const { value } = e.target;
+    dispatch({
+      type: METHODS.CheckWhatsapp,
+      payload: value,
+    });
   };
   return (
     <Container>
@@ -131,8 +147,19 @@ const ContactListComponent = () => {
         <div style={{ color: "black" }}>
           <Input
             type="text"
-            name="idInstance"
-            placeholder="idChat"
+            name="name"
+            placeholder="ФИО контакта"
+            // value={authData.idInstance}
+            onChange={handleChangeName}
+          />
+          <p style={{ color: "gray", fontSize: 14 }}>
+            Номер телефона получателя в международном формате: 11 или 12 цифр;
+            <br /> Пример: 11001234567 или 380123456789
+          </p>
+          <Input
+            type="text"
+            name="idChat"
+            placeholder="Номер телефона (idChat)"
             // value={authData.idInstance}
             onChange={handleChange}
           />

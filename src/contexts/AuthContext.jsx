@@ -15,7 +15,7 @@ const INIT_STATE = {
 
 const reducer = (state = INIT_STATE, action) => {
   switch (action.type) {
-    case "get":
+    case METHODS.GetSettings:
       return {
         ...state,
         userData: action.payload,
@@ -50,9 +50,8 @@ const AuthContextProvider = ({ children }) => {
           authData.apiTokenInstance
       )
       .then((res) => {
-        console.log(res.data);
         dispatch({
-          type: "get",
+          type: METHODS.GetSettings,
           payload: res.data,
         });
         dispatch({
@@ -65,8 +64,6 @@ const AuthContextProvider = ({ children }) => {
         alert("Не найден такой инстанс. Попробуте ещё раз");
       });
   };
-
-  console.log(state);
 
   const values = {
     authData,

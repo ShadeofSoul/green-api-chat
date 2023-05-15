@@ -1,6 +1,9 @@
 import styled from "styled-components";
 import { messagesList } from "../Data";
 import { SearchContainer, SearchInput } from "./ContactListComponents";
+import { useContact } from "../contexts/ContactContext";
+import { METHODS } from "../helpers/consts";
+import { useChat } from "../contexts/ChatContext";
 
 const Container = styled.div`
   display: flex;
@@ -68,6 +71,15 @@ const Message = styled.div`
 `;
 
 const ConversationComponent = () => {
+  const { dispatch, state, handleSubmit } = useChat();
+  const handleChange = (e) => {
+    e.preventDefault();
+    const { value } = e.target;
+    dispatch({
+      type: METHODS.SendMessage,
+      payload: value,
+    });
+  };
   return (
     <Container>
       <ProfileHeader>
@@ -78,7 +90,7 @@ const ConversationComponent = () => {
         {messagesList.map((messageData) => (
           <MessageDiv isYours={messageData.senderID === 0}>
             <Message isYours={messageData.senderID === 0}>
-              {[messageData.text]}{" "}
+              {[messageData.message]}{" "}
             </Message>
           </MessageDiv>
         ))}
@@ -86,8 +98,8 @@ const ConversationComponent = () => {
       <ChatBox>
         <SearchContainer>
           <EmojiImage src={"/data.svg"} />
-          <SearchInput placeholder="Type a message" />
-          <SendiImage src={"/-send_90420.svg"} />
+          <SearchInput onChange={handleChange} placeholder="Type a message" />
+          <SendiImage src={"/-send_90420.svg"} onClick={handleSubmit} />
         </SearchContainer>
       </ChatBox>
     </Container>

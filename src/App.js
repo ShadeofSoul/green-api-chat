@@ -6,6 +6,8 @@ import AuthContextProvider from "./contexts/AuthContext";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Main from "./components/Main";
 import { useState } from "react";
+import ContactContextProvider from "./contexts/ContactContext";
+import ChatContextProvider from "./contexts/ChatContext";
 
 const Container = styled.div`
   display: flex;
@@ -19,10 +21,14 @@ function App() {
     <BrowserRouter>
       <Container>
         <AuthContextProvider>
-          <Routes>
-            <Route exact path="/login" element={<Auth />} />
-            <Route exact path="/" element={<Main />} />
-          </Routes>
+          <ContactContextProvider>
+            <ChatContextProvider>
+              <Routes>
+                <Route exact path="/login" element={<Auth />} />
+                <Route exact path="/" element={<Main />} />
+              </Routes>
+            </ChatContextProvider>
+          </ContactContextProvider>
         </AuthContextProvider>
       </Container>
     </BrowserRouter>
