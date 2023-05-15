@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import styled, { keyframes, createGlobalStyle } from "styled-components";
 import { useAuth } from "../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const jump = keyframes`
   from{
@@ -88,8 +89,16 @@ const Title = styled.h2`
   text-align: center;
 `;
 
-function Auth() {
-  const { authData, setAuthData, handleSubmit } = useAuth();
+function Auth({ user, setUser }) {
+  const { authData, setAuthData, handleSubmit, state } = useAuth();
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (state.user) {
+      navigate("/");
+    } else {
+      navigate("/login");
+    }
+  }, []);
 
   const handleChange = (e) => {
     e.preventDefault();
@@ -115,6 +124,7 @@ function Auth() {
             // value={authData.apiTokenInstance}
             onChange={handleChange}
           />
+
           <Button>Enter</Button>
         </Form>
       </Wrapper>
