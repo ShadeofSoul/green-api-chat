@@ -4,6 +4,7 @@ import { SearchContainer, SearchInput } from "./ContactListComponents";
 import { useContact } from "../contexts/ContactContext";
 import { METHODS } from "../helpers/consts";
 import { useChat } from "../contexts/ChatContext";
+import { useEffect } from "react";
 
 const Container = styled.div`
   display: flex;
@@ -71,7 +72,8 @@ const Message = styled.div`
 `;
 
 const ConversationComponent = () => {
-  const { dispatch, state, handleSubmit } = useChat();
+  const { dispatch, chatState, handleSubmit } = useChat();
+
   const handleChange = (e) => {
     e.preventDefault();
     const { value } = e.target;
@@ -80,6 +82,7 @@ const ConversationComponent = () => {
       payload: value,
     });
   };
+
   return (
     <Container>
       <ProfileHeader>
@@ -87,10 +90,10 @@ const ConversationComponent = () => {
         Anubhav Sharma
       </ProfileHeader>
       <MessageContainer>
-        {messagesList.map((messageData) => (
+        {chatState.allMessages.map((messageData) => (
           <MessageDiv isYours={messageData.senderID === 0}>
             <Message isYours={messageData.senderID === 0}>
-              {[messageData.message]}{" "}
+              {[messageData.textMessage]}{" "}
             </Message>
           </MessageDiv>
         ))}

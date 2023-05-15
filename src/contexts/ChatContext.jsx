@@ -1,5 +1,11 @@
 import axios from "axios";
-import React, { createContext, useContext, useReducer, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useReducer,
+  useState,
+} from "react";
 import { METHODS, API } from "../helpers/consts";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
@@ -15,6 +21,7 @@ const INIT_STATE = {
   message: "",
   idMessage: "",
   senderID: 0,
+  allMessages: [],
 };
 
 const reducer = (chatState = INIT_STATE, action) => {
@@ -29,6 +36,11 @@ const reducer = (chatState = INIT_STATE, action) => {
         ...chatState,
         idMessage: action.payload,
       };
+    case "getMess":
+      return {
+        ...chatState,
+        allMessages: action.payload,
+      };
     default:
       return chatState;
   }
@@ -38,22 +50,51 @@ const ChatContextProvider = ({ children }) => {
   const [chatState, dispatch] = useReducer(reducer, INIT_STATE);
   const { authData } = useAuth();
   const { state } = useContact();
+  // const [messages, setMessages] = useState([]);
+
+  useEffect(() => {
+    const fetchMessages = async () => {
+      try {
+        const [myMessagesResponse, friendMessagesResponse] = await axios.all([
+          axios.get(
+            API +
+              authData.idInstance +
+              "/" +
+              METHODS.lastIncomingMessages +
+              "/" +
+              authData.apiTokenInstance
+          ),
+          axios.get(
+            API +
+              authData.idInstance +
+              "/" +
+              METHODS.LastOutgoingMessages +
+              "/" +
+              authData.apiTokenInstance
+          ),
+        ]);
+
+        const allMessages = [
+          ...myMessagesResponse.data,
+          ...friendMessagesResponse.data,
+        ];
+        allMessages.sort((a, b) => a.timestamp - b.timestamp);
+
+        dispatch({
+          type: "getMess",
+          payload: allMessages,
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchMessages();
+  }, [state.existswhatsapp]);
+
   console.log(chatState);
 
-  const getMessage = () => {
-    axios
-      .get(
-        API +
-          authData.idInstance +
-          "/" +
-          METHODS.ReceiveNotification +
-          "/" +
-          authData.apiTokenInstance
-      )
-      .then((res) => {
-        console.log(res.data.body);
-      });
-  };
+  // Код отображения чата, используя полученные данные
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -61,34 +102,32 @@ const ChatContextProvider = ({ children }) => {
       chatId: state.phoneNumber + "@c.us",
       message: chatState.message,
     };
-    console.log(body);
     axios
       .post(
         API +
           authData.idInstance +
           "/" +
-          METHODS.SendMessage +
+          METHODS.sendMessage +
           "/" +
           authData.apiTokenInstance,
         body
       )
       .then((res) => {
-        console.log(res.data);
         dispatch({
           type: "send",
           payload: res.data.idMessage,
         });
         messagesList.push(chatState);
-        console.log(messagesList);
-        // getMessage();
       })
       .catch((error) => {
-        alert(
-          "Не найден такой контакт. Проверьте корректность номера телефона или же его подвяску к WhatsApp"
-        );
+        alert("Не получилось отправить сообщение");
       });
   };
-  const values = { dispatch, chatState, handleSubmit };
+  const values = {
+    dispatch,
+    chatState,
+    handleSubmit,
+  };
 
   return <chatContext.Provider value={values}>{children}</chatContext.Provider>;
 };

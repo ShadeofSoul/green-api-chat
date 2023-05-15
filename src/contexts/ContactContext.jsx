@@ -4,7 +4,6 @@ import { METHODS, API } from "../helpers/consts";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 import { contactList } from "../Data";
-import whatsAppClient from "@green-api/whatsapp-api-client";
 
 export const contactContext = createContext();
 export const useContact = () => {
