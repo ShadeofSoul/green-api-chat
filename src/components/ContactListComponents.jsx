@@ -1,9 +1,9 @@
 import styled from "styled-components";
-import { contactList } from "../Data";
 import { useState } from "react";
 import { StyledModal } from "./Modal";
 import { useContact } from "../contexts/ContactContext";
 import { METHODS } from "../helpers/consts";
+import { useChat } from "../contexts/ChatContext";
 
 const Container = styled.div`
   display: flex;
@@ -22,6 +22,7 @@ const ProfileImage = styled.img`
   width: 40px;
   height: 40px;
   border-radius: 50%;
+  padding-right: 10px;
 `;
 const SearchBox = styled.div`
   display: flex;
@@ -108,21 +109,23 @@ const Input = styled.input`
 
 const ContactComponent = (props) => {
   const { userData } = props;
-  return (
+  console.log(userData);
+  return userData?.existswhatsapp ? (
     <ContactItem>
       <ProfileIcon src={"/profile/pp1.png"} />
       <ContactInfo>
         <ContactName>{userData.name}</ContactName>
-        <MessageText>Hello</MessageText>
+        <MessageText>...загрузка</MessageText>
       </ContactInfo>
-      <MessageText>{userData.time}</MessageText>
+      <MessageText>{}</MessageText>
     </ContactItem>
-  );
+  ) : null;
 };
 
 const ContactListComponent = () => {
   const [isPopOpen, setIsPosOpen] = useState(false);
-  const { state, dispatch } = useContact();
+  const { contactState, dispatch } = useContact();
+  const { fetchMessages } = useChat();
 
   const handleChangeName = (e) => {
     e.preventDefault();
@@ -166,7 +169,8 @@ const ContactListComponent = () => {
         </div>
       </StyledModal>
       <ProfileInfoDiv>
-        <ProfileImage src="/profile/profilephoto.jpeg" />
+        <ProfileImage src="/profile/pp2.png" />
+        <ContactName>Me</ContactName>
       </ProfileInfoDiv>
       <SearchBox>
         <SearchContainer>
@@ -174,9 +178,9 @@ const ContactListComponent = () => {
           <SearchInput placeholder="Search or start new chat" />
         </SearchContainer>
       </SearchBox>
-      {contactList.map((userData) => (
-        <ContactComponent userData={userData} />
-      ))}
+
+      <ContactComponent userData={contactState} />
+
       <PluseImage src={"/pluse.svg"} onClick={() => setIsPosOpen(!isPopOpen)} />
     </Container>
   );

@@ -48,9 +48,9 @@ export const StyledModal = ({ handleClose, show, children }) => {
     <ModalDiv block={show ? "block" : "none"}>
       <ContentDiv>
         {children}
-        <Button onClick={handleSubmit}>Add Contact</Button>
+        <Button onClick={handleSubmit}>Добавить контакт</Button>
         <Button style={{ marginLeft: "70%" }} onClick={handleClose}>
-          Close
+          Закрыт
         </Button>
       </ContentDiv>
     </ModalDiv>

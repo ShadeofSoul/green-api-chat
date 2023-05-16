@@ -1,13 +1,15 @@
 import styled from "styled-components";
-import { messagesList } from "../Data";
 import { SearchContainer, SearchInput } from "./ContactListComponents";
 import { useContact } from "../contexts/ContactContext";
 import { METHODS } from "../helpers/consts";
 import { useChat } from "../contexts/ChatContext";
 import { useEffect } from "react";
+import { useAuth } from "../contexts/AuthContext";
 
 const Container = styled.div`
   display: flex;
+  overflow-y: scroll;
+  flex-flow: column nowrap;
   flex-direction: column;
   height: 100%;
   flex: 2;
@@ -73,12 +75,14 @@ const Message = styled.div`
 
 const ConversationComponent = () => {
   const { dispatch, chatState, handleSubmit } = useChat();
+  const { contactState } = useContact();
+  const { state } = useAuth();
 
   const handleChange = (e) => {
     e.preventDefault();
     const { value } = e.target;
     dispatch({
-      type: METHODS.SendMessage,
+      type: METHODS.sendMessage,
       payload: value,
     });
   };
@@ -86,13 +90,14 @@ const ConversationComponent = () => {
   return (
     <Container>
       <ProfileHeader>
-        <ProfileImage src="/profile/IMG_3464.jpg" />
-        Anubhav Sharma
+        <ProfileImage src="/profile/pp1.png" />
+        {contactState.name}
       </ProfileHeader>
       <MessageContainer>
         {chatState.allMessages.map((messageData) => (
-          <MessageDiv isYours={messageData.senderID === 0}>
-            <Message isYours={messageData.senderID === 0}>
+          <MessageDiv isYours={messageData.sendByApi ? true : false}>
+            {console.log(messageData.chatId === state.userData.wid)}
+            <Message isYours={messageData.sendByApi ? true : false}>
               {[messageData.textMessage]}{" "}
             </Message>
           </MessageDiv>
@@ -101,7 +106,11 @@ const ConversationComponent = () => {
       <ChatBox>
         <SearchContainer>
           <EmojiImage src={"/data.svg"} />
-          <SearchInput onChange={handleChange} placeholder="Type a message" />
+          <SearchInput
+            value={chatState.message}
+            onChange={handleChange}
+            placeholder="Type a message"
+          />
           <SendiImage src={"/-send_90420.svg"} onClick={handleSubmit} />
         </SearchContainer>
       </ChatBox>

@@ -3,7 +3,6 @@ import React, { createContext, useContext, useReducer, useState } from "react";
 import { METHODS, API } from "../helpers/consts";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
-import { contactList } from "../Data";
 
 export const contactContext = createContext();
 export const useContact = () => {
@@ -14,7 +13,6 @@ const INIT_STATE = {
   phoneNumber: "",
   existswhatsapp: false,
   name: "",
-  time: new Date().getHours() + ":" + new Date().getMinutes(),
 };
 
 const reducer = (state = INIT_STATE, action) => {
@@ -67,7 +65,6 @@ const ContactContextProvider = ({ children }) => {
             type: "add",
             payload: res.data.existsWhatsapp,
           });
-          contactList.push(state);
           alert("Контакт успешно добавлен");
         }
       })
@@ -80,7 +77,7 @@ const ContactContextProvider = ({ children }) => {
 
   const values = {
     dispatch,
-    state,
+    contactState: state,
     handleSubmit,
   };
 
