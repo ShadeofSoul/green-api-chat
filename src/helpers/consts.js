@@ -6,4 +6,5 @@ export const METHODS = {
   ReceiveNotification: "ReceiveNotification",
   lastIncomingMessages: "lastIncomingMessages",
   LastOutgoingMessages: "LastOutgoingMessages",
+  GetChatHistory: "GetChatHistory",
 };

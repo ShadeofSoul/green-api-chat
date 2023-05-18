@@ -1,6 +1,5 @@
 import styled from "styled-components";
 import { SearchContainer, SearchInput } from "./ContactListComponents";
-import { useContact } from "../contexts/ContactContext";
 import { METHODS } from "../helpers/consts";
 import { useChat } from "../contexts/ChatContext";
 import { useEffect } from "react";
@@ -75,7 +74,6 @@ const Message = styled.div`
 
 const ConversationComponent = () => {
   const { dispatch, chatState, handleSubmit } = useChat();
-  const { contactState } = useContact();
   const { state } = useAuth();
 
   const handleChange = (e) => {
@@ -91,14 +89,13 @@ const ConversationComponent = () => {
     <Container>
       <ProfileHeader>
         <ProfileImage src="/profile/pp1.png" />
-        {contactState.name}
+        {chatState.name}
       </ProfileHeader>
       <MessageContainer>
-        {chatState.allMessages.map((messageData) => (
+        {chatState?.allMessages?.map((messageData) => (
           <MessageDiv isYours={messageData.sendByApi ? true : false}>
-            {console.log(messageData.chatId === state.userData.wid)}
             <Message isYours={messageData.sendByApi ? true : false}>
-              {[messageData.textMessage]}{" "}
+              {[messageData.textMessage || messageData.message]}{" "}
             </Message>
           </MessageDiv>
         ))}

@@ -9,7 +9,6 @@ import React, {
 import { METHODS, API } from "../helpers/consts";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
-import { useContact } from "./ContactContext";
 
 export const chatContext = createContext();
 export const useChat = () => {
@@ -20,6 +19,9 @@ const INIT_STATE = {
   message: "",
   idMessage: "",
   allMessages: [],
+  phoneNumber: "",
+  existswhatsapp: false,
+  name: "",
 };
 
 const reducer = (chatState = INIT_STATE, action) => {
@@ -39,6 +41,26 @@ const reducer = (chatState = INIT_STATE, action) => {
         ...chatState,
         allMessages: action.payload,
       };
+    case "sendMess":
+      return {
+        ...chatState,
+        allMessages: [...chatState.allMessages, action.payload],
+      };
+    case METHODS.CheckWhatsapp:
+      return {
+        ...chatState,
+        phoneNumber: action.payload,
+      };
+    case "add":
+      return {
+        ...chatState,
+        existswhatsapp: action.payload,
+      };
+    case "addName":
+      return {
+        ...chatState,
+        name: action.payload,
+      };
     default:
       return chatState;
   }
@@ -47,13 +69,13 @@ const reducer = (chatState = INIT_STATE, action) => {
 const ChatContextProvider = ({ children }) => {
   const [chatState, dispatch] = useReducer(reducer, INIT_STATE);
   const { authData } = useAuth();
-  const { contactState } = useContact();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    fetchMessages();
+    getHistoryOfChat();
+
     const body = {
-      chatId: contactState.phoneNumber + "@c.us",
+      chatId: chatState.phoneNumber + "@c.us",
       message: chatState.message,
     };
     axios
@@ -67,70 +89,109 @@ const ChatContextProvider = ({ children }) => {
         body
       )
       .then((res) => {
-        if (res.status === 200) {
-          fetchMessages();
-
-          dispatch({
-            type: "send",
-            payload: res.data.idMessage,
-          });
-        }
+        dispatch({
+          type: "sendMess",
+          payload: {
+            ...body,
+            sendByApi: true,
+          },
+        });
+        dispatch({
+          type: METHODS.sendMessage,
+          payload: "",
+        });
+        // getHistoryOfChat();
       })
       .catch((error) => {
         alert("Не получилось отправить сообщение");
       });
   };
 
-  // useEffect(() => {
-  const fetchMessages = async () => {
-    try {
-      const [myMessagesResponse, friendMessagesResponse] = await axios.all([
-        axios.get(
-          API +
-            authData.idInstance +
-            "/" +
-            METHODS.lastIncomingMessages +
-            "/" +
-            authData.apiTokenInstance
-        ),
-        axios.get(
-          API +
-            authData.idInstance +
-            "/" +
-            METHODS.LastOutgoingMessages +
-            "/" +
-            authData.apiTokenInstance
-        ),
-      ]);
-      dispatch({
-        type: METHODS.sendMessage,
-        payload: "",
+  const handleSubmitContact = (e) => {
+    e.preventDefault();
+    const body = { phoneNumber: chatState.phoneNumber };
+    axios
+      .post(
+        API +
+          authData.idInstance +
+          "/" +
+          METHODS.CheckWhatsapp +
+          "/" +
+          authData.apiTokenInstance,
+        body
+      )
+      .then((res) => {
+        if (!res.data.existsWhatsapp) {
+          alert(
+            "Не найден такой контакт. Проверьте корректность номера телефона или же его подвяску к WhatsApp"
+          );
+        } else {
+          dispatch({
+            type: "add",
+            payload: res.data.existsWhatsapp,
+          });
+          alert("Контакт успешно добавлен");
+        }
+      })
+      .catch((error) => {
+        alert(
+          "Не найден такой контакт. Проверьте корректность номера телефона или же его подвяску к WhatsApp"
+        );
       });
-
-      const allMessages = [
-        ...myMessagesResponse.data,
-        ...friendMessagesResponse.data,
-      ];
-      allMessages.sort((a, b) => a.timestamp - b.timestamp);
-
-      dispatch({
-        type: "getMess",
-        payload: allMessages,
+  };
+  useEffect(() => {
+    axios
+      .get(
+        API +
+          authData.idInstance +
+          "/" +
+          METHODS.ReceiveNotification +
+          "/" +
+          authData.apiTokenInstance
+      )
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((error) => {
+        console.log(error);
       });
-    } catch (error) {
-      console.error(error);
-    }
+  }, [chatState.phoneNumber]);
+
+  const getHistoryOfChat = () => {
+    const body = {
+      chatId: chatState.phoneNumber + "@c.us",
+      count: 20,
+    };
+    console.log(body);
+    axios
+      .post(
+        API +
+          authData.idInstance +
+          "/" +
+          METHODS.GetChatHistory +
+          "/" +
+          authData.apiTokenInstance,
+        body
+      )
+      .then((res) => {
+        console.log(res);
+        dispatch({
+          type: "getMess",
+          payload: res.data.reverse(),
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
-  // }, [state.message]);
-
-  console.log(chatState);
+  console.log(chatState.allMessages);
 
   const values = {
     dispatch,
     chatState,
     handleSubmit,
-    fetchMessages,
+    handleSubmitContact,
   };
 
   return <chatContext.Provider value={values}>{children}</chatContext.Provider>;

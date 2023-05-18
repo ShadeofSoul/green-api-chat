@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { useContact } from "../contexts/ContactContext";
+import { useChat } from "../contexts/ChatContext";
 
 const ModalDiv = styled.div`
   display: ${(p) => p.block && p.block};
@@ -42,13 +42,13 @@ const Button = styled.button`
 `;
 
 export const StyledModal = ({ handleClose, show, children }) => {
-  const { handleSubmit } = useContact();
+  const { handleSubmitContact } = useChat();
 
   return (
     <ModalDiv block={show ? "block" : "none"}>
       <ContentDiv>
         {children}
-        <Button onClick={handleSubmit}>Добавить контакт</Button>
+        <Button onClick={handleSubmitContact}>Добавить контакт</Button>
         <Button style={{ marginLeft: "70%" }} onClick={handleClose}>
           Закрыт
         </Button>

@@ -1,7 +1,6 @@
 import styled from "styled-components";
 import { useState } from "react";
 import { StyledModal } from "./Modal";
-import { useContact } from "../contexts/ContactContext";
 import { METHODS } from "../helpers/consts";
 import { useChat } from "../contexts/ChatContext";
 
@@ -109,7 +108,7 @@ const Input = styled.input`
 
 const ContactComponent = (props) => {
   const { userData } = props;
-  console.log(userData);
+
   return userData?.existswhatsapp ? (
     <ContactItem>
       <ProfileIcon src={"/profile/pp1.png"} />
@@ -124,8 +123,7 @@ const ContactComponent = (props) => {
 
 const ContactListComponent = () => {
   const [isPopOpen, setIsPosOpen] = useState(false);
-  const { contactState, dispatch } = useContact();
-  const { fetchMessages } = useChat();
+  const { chatState, dispatch, fetchMessages } = useChat();
 
   const handleChangeName = (e) => {
     e.preventDefault();
@@ -179,7 +177,7 @@ const ContactListComponent = () => {
         </SearchContainer>
       </SearchBox>
 
-      <ContactComponent userData={contactState} />
+      <ContactComponent userData={chatState} />
 
       <PluseImage src={"/pluse.svg"} onClick={() => setIsPosOpen(!isPopOpen)} />
     </Container>
