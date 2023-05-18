@@ -1,13 +1,6 @@
 import axios from "axios";
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useReducer,
-  useState,
-} from "react";
+import React, { createContext, useContext, useReducer } from "react";
 import { METHODS, API } from "../helpers/consts";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 
 export const chatContext = createContext();
@@ -139,23 +132,6 @@ const ChatContextProvider = ({ children }) => {
         );
       });
   };
-  useEffect(() => {
-    axios
-      .get(
-        API +
-          authData.idInstance +
-          "/" +
-          METHODS.ReceiveNotification +
-          "/" +
-          authData.apiTokenInstance
-      )
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, [chatState.phoneNumber]);
 
   const getHistoryOfChat = () => {
     const body = {
